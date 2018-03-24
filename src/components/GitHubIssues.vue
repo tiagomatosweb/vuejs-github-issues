@@ -49,19 +49,22 @@
             </thead>
 
             <tbody>
-            <tr v-if="loader.getIssues || loader.getIssue">
+            <tr v-if="loader.getIssues">
                 <td class="text-center" colspan="2"><img src="/static/loading.svg" alt=""></td>
             </tr>
 
-            <template v-if="!loader.getIssue">
-                <tr v-if="!!issues.length && !loader.getIssues"
-                    v-for="issue in issues"
-                    :key="issue.number">
-                    <td><a @click.prevent.stop="getIssue(issue.number)"
-                           href="">{{ issue.number }}</a></td>
-                    <td>{{ issue.title }}</td>
-                </tr>
-            </template>
+            <tr v-if="!!issues.length && !loader.getIssues"
+                v-for="issue in issues"
+                :key="issue.number">
+                <td>
+                    <a @click.prevent.stop="getIssue(issue)"
+                       href="">{{ issue.number }}</a>
+                    <img v-if="issue.is_loading"
+                         src="/static/loading.svg" alt="" height="20">
+                </td>
+
+                <td>{{ issue.title }}</td>
+            </tr>
 
             <tr v-if="!!!issues.length && !loader.getIssues">
                 <td class="text-center" colspan="2">Nenhuma issue encontrada!</td>
@@ -85,7 +88,6 @@
                 selectedIssue: {},
                 loader: {
                     getIssues: false,
-                    getIssue: false,
                 },
             };
         },
@@ -108,14 +110,14 @@
                 }
             },
 
-            getIssue(issueId) {
+            getIssue(issue) {
                 if (this.username && this.repository) {
-                    this.loader.getIssue = true;
-                    const url = `https://api.github.com/repos/${this.username}/${this.repository}/issues/${issueId}`;
+                    this.$set(issue, 'is_loading', true);
+                    const url = `https://api.github.com/repos/${this.username}/${this.repository}/issues/${issue.number}`;
                     axios.get(url).then((response) => {
                         this.selectedIssue = response.data;
                     }).finally(() => {
-                        this.loader.getIssue = false;
+                        this.$set(issue, 'is_loading', false);
                     });
                 }
             },
