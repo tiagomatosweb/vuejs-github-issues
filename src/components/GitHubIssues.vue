@@ -49,17 +49,19 @@
             </thead>
 
             <tbody>
-            <tr v-if="loader.getIssues">
+            <tr v-if="loader.getIssues || loader.getIssue">
                 <td class="text-center" colspan="2"><img src="/static/loading.svg" alt=""></td>
             </tr>
 
-            <tr v-if="!!issues.length && !loader.getIssues"
-                v-for="issue in issues"
-                :key="issue.number">
-                <td><a @click.prevent.stop="getIssue(issue.number)"
-                       href="">{{ issue.number }}</a></td>
-                <td>{{ issue.title }}</td>
-            </tr>
+            <template v-if="!loader.getIssue">
+                <tr v-if="!!issues.length && !loader.getIssues"
+                    v-for="issue in issues"
+                    :key="issue.number">
+                    <td><a @click.prevent.stop="getIssue(issue.number)"
+                           href="">{{ issue.number }}</a></td>
+                    <td>{{ issue.title }}</td>
+                </tr>
+            </template>
 
             <tr v-if="!!!issues.length && !loader.getIssues">
                 <td class="text-center" colspan="2">Nenhuma issue encontrada!</td>
